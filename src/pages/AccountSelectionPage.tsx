@@ -45,69 +45,80 @@ const initialHelpAnswers: HelpAnswers = {
   situation: '', income: '', balance: '', overdraft: '', priority: '', primaryGoal: '', services: [], habits: '',
 }
 
-function recommendAccount(answers: HelpAnswers) {
-  const scores = accounts.map(account => ({ account, score: 0 }))
+function recommendAccounts(answers: HelpAnswers) {
+  const scores = accounts
+    .filter(account => !['teen-checking', 'teen-kidz-savings'].includes(account.id))
+    .map(account => ({ account, score: 0 }))
   const product = (id: string) => productReferenceAccounts.find(item => item.id === id)
-  const goalAccount: Record<ServiceId, string> = {
-    'everyday-banking': 'free-checking',
-    'save-goals': 'savings',
-    'larger-savings': 'money-market',
-    'term-savings': 'certificates',
-    retirement: 'ira',
-    'credit-cards': 'plus-checking',
-    loans: 'plus-checking',
-    overdraft: 'simply-u',
-    digital: 'free-checking',
-    business: 'free-checking',
-    insurance: 'free-checking',
-    investments: 'ira',
+  const category = (id: string) => accounts.find(account => account.id === id)?.category
+  const scoreCategory = (target: Account['category'], points: number) => {
+    scores.filter(item => item.account.category === target).forEach(item => { item.score += points })
   }
   const score = (id: string, points: number) => {
     const match = scores.find(item => item.account.id === id)
     if (match) match.score += points
   }
-  if (answers.primaryGoal) score(goalAccount[answers.primaryGoal], 20)
-  if (answers.situation === 'student') score('simply-u', 2)
-  if (answers.situation === 'working') score('free-checking', 1)
-  if (answers.situation === 'both') score('free-checking', 2)
-  if (answers.income === 'lower') score('simply-u', 2)
-  if (answers.income === 'steady') score('free-checking', 2)
-  if (answers.income === 'higher') score('plus-checking', 2)
-  if (answers.balance === 'lower') score('simply-u', 2)
-  if (answers.balance === 'growing') score('free-checking', 1)
-  if (answers.balance === 'higher') score('plus-checking', 2)
-  if (answers.overdraft === 'protect' && product('simply-u')?.overdraft.includes('none')) score('simply-u', 3)
-  if (answers.overdraft === 'occasionally') score('free-checking', 2)
-  if (answers.overdraft === 'not_concerned') score('plus-checking', 1)
-  if (answers.priority === 'simple') score('simply-u', 3)
-  if (answers.priority === 'flexible' && product('free-checking')?.monthly_fee_usd === 0) score('free-checking', 3)
-  if (answers.priority === 'extras' && product('plus-checking')?.perks?.length) score('plus-checking', 3)
-  answers.services.forEach(service => score(goalAccount[service as ServiceId], service === answers.primaryGoal ? 8 : 6))
-  if (answers.services.includes('overdraft') && product('simply-u')?.overdraft.includes('none')) score('simply-u', 2)
+  const goalCategories: Partial<Record<ServiceId, Account['category']>> = {
+    'everyday-banking': 'CHECKING', 'save-goals': 'SAVINGS', 'larger-savings': 'MONEY MARKET',
+    'term-savings': 'CDS', retirement: 'IRAS', overdraft: 'CHECKING', digital: 'CHECKING',
+  }
+  const relationshipGoals: Partial<Record<ServiceId, string>> = {
+    'credit-cards': 'plus-checking', loans: 'plus-checking', business: 'free-checking',
+    insurance: 'free-checking', investments: 'ira',
+  }
+  if (answers.primaryGoal && goalCategories[answers.primaryGoal]) scoreCategory(goalCategories[answers.primaryGoal]!, 35)
+  if (answers.primaryGoal && relationshipGoals[answers.primaryGoal]) score(relationshipGoals[answers.primaryGoal]!, 22)
+  answers.services.forEach(service => {
+    const target = goalCategories[service as ServiceId]
+    if (target) scoreCategory(target, service === answers.primaryGoal ? 15 : 8)
+    const relationshipAccount = relationshipGoals[service as ServiceId]
+    if (relationshipAccount) score(relationshipAccount, service === answers.primaryGoal ? 10 : 5)
+  })
+  if (answers.situation === 'student') { score('simply-u', 8); score('savings', 7) }
+  if (answers.situation === 'working') score('free-checking', 4)
+  if (answers.situation === 'both') { score('free-checking', 5); score('savings', 4) }
+  if (answers.income === 'lower') { score('simply-u', 8); scoreCategory('SAVINGS', 6) }
+  if (answers.income === 'steady') { score('free-checking', 5); score('savings', 5) }
+  if (answers.income === 'higher') { score('plus-checking', 10); score('money-market', 12); score('certificates', 7); score('ira', 5) }
+  if (answers.balance === 'lower') { score('simply-u', 6); score('savings', 7) }
+  if (answers.balance === 'growing') { score('savings', 18); score('special-savings', 14); score('money-market', 6) }
+  if (answers.balance === 'higher') { score('money-market', 24); score('certificates', 16); score('ira', 12); score('plus-checking', 6) }
+  if (answers.overdraft === 'protect') { score('simply-u', 14); score('savings', 5) }
+  if (answers.overdraft === 'occasionally') { score('free-checking', 6); score('plus-checking', 6) }
+  if (answers.overdraft === 'not_concerned') { score('plus-checking', 7); score('savings', 3) }
+  if (answers.priority === 'simple') { score('simply-u', 8); score('savings', 7) }
+  if (answers.priority === 'flexible') { score('free-checking', 7); score('savings', 8); score('money-market', 8) }
+  if (answers.priority === 'extras') { score('plus-checking', 13); score('certificates', 8); score('ira', 7) }
   const habits = answers.habits.toLowerCase()
-  if (habits.includes('overdraft') || habits.includes('avoid')) score('simply-u', 1)
-  if (habits.includes('direct deposit') || habits.includes('paycheck')) score('free-checking', 1)
-  if (habits.includes('save') || habits.includes('balance')) score('plus-checking', 1)
-  return scores.sort((a, b) => b.score - a.score)[0].account
+  if (habits.includes('overdraft') || habits.includes('avoid')) score('simply-u', 8)
+  if (habits.includes('direct deposit') || habits.includes('paycheck')) score('free-checking', 7)
+  if (habits.includes('save') || habits.includes('balance') || habits.includes('goal')) { score('savings', 10); score('special-savings', 8) }
+  if (habits.includes('retire') || habits.includes('ira')) score('ira', 18)
+  if (habits.includes('lock') || habits.includes('term') || habits.includes('certificate')) score('certificates', 18)
+  if (habits.includes('emergency')) score('savings', 12)
+  const monthlyFee = product('plus-checking')?.monthly_fee_usd ?? 0
+  if (answers.income !== 'higher' && answers.balance !== 'higher' && monthlyFee > 0) score('plus-checking', -8)
+  return scores.sort((a, b) => b.score - a.score || (category(a.account.id) ?? '').localeCompare(category(b.account.id) ?? '')).map(item => item.account)
 }
 
 function HelpMeChoose({ onChoose }: { onChoose: (account: Account) => void }) {
   const [answers, setAnswers] = useState(initialHelpAnswers)
-  const [recommendation, setRecommendation] = useState<Account | null>(null)
+  const [recommendation, setRecommendation] = useState<Account[] | null>(null)
   const update = <K extends keyof HelpAnswers>(key: K, value: HelpAnswers[K]) => setAnswers(previous => ({ ...previous, [key]: value }))
   const canRecommend = answers.situation && answers.income && answers.balance && answers.overdraft && answers.priority && answers.primaryGoal
 
   if (recommendation) {
-    const explanation = recommendation.id === 'simply-u'
+    const primary = recommendation[0]
+    const explanation = primary.id === 'simply-u'
       ? 'Your answers point to straightforward spending with no overdraft fees and no spending beyond deposited funds.'
-      : recommendation.id === 'free-checking'
+      : primary.id === 'free-checking'
         ? 'Your answers point to flexible everyday banking with no monthly fee and digital banking features.'
-        : recommendation.id === 'plus-checking'
+        : primary.id === 'plus-checking'
           ? 'Your answers point to premium checking perks that may fit your balances, deposits, and broader service goals.'
-          : `Your answers point to ${recommendation.name} as a match for the savings goal you selected.`
+          : `Your answers point to ${primary.name} as a match for your goals, balances, and savings preferences.`
     return <div className="chooser-result">
       <div className="recommendation-badge">YOUR MATCH</div>
-      <h3>{recommendation.name}</h3>
+      <h3>{primary.name}</h3>
       <p>{explanation}</p>
       <p className="reference-note">Matched against UFCU product information reviewed {productReferenceDate}. This is guidance for the prototype, not an eligibility or financial advice decision.</p>
       <div className="profile-summary">
@@ -119,16 +130,16 @@ function HelpMeChoose({ onChoose }: { onChoose: (account: Account) => void }) {
         {answers.habits && <span>Banking habits noted: “{answers.habits}”</span>}
       </div>
       <div className="comparison-list">
-        <strong>Compare all accounts</strong>
-        {accounts.map(account => <div className={`comparison-row ${account.id === recommendation.id ? 'is-match' : ''}`} key={account.id}>
+        <strong>Top UFCU matches based on your answers</strong>
+        {recommendation.slice(0, 5).map((account, index) => <div className={`comparison-row ${index === 0 ? 'is-match' : ''}`} key={account.id}>
           <span><b>{account.name}</b><small>{account.description}</small></span>
-          <Button variant={account.id === recommendation.id ? 'primary' : 'secondary'} onClick={() => onChoose(account)}>{account.id === recommendation.id ? 'Choose this account' : 'Choose'}</Button>
+          <Button variant={index === 0 ? 'primary' : 'secondary'} onClick={() => onChoose(account)}>{index === 0 ? 'Choose this account' : 'Choose'}</Button>
         </div>)}
       </div>
     </div>
   }
 
-  return <form className="chooser-form" onSubmit={event => { event.preventDefault(); if (canRecommend) setRecommendation(recommendAccount(answers)) }}>
+  return <form className="chooser-form" onSubmit={event => { event.preventDefault(); if (canRecommend) setRecommendation(recommendAccounts(answers)) }}>
     <p className="chooser-intro">Answer a few questions about your life, goals, and the UFCU services you may need. We’ll turn your answers into a simple profile and match it against the products in this prototype. Nothing is saved outside this demo.</p>
     <div className="chooser-question"><p className="field-legend">Which best describes you?</p><div className="chooser-options">
       <label><input type="radio" name="situation" checked={answers.situation === 'working'} onChange={() => update('situation', 'working')} /> Working</label>

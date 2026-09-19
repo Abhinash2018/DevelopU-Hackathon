@@ -4,22 +4,22 @@ import productReference from '../../skills/UFCU_products.md?raw'
 type ProductReferenceAccount = {
   id: string
   name: string
-  monthly_fee_usd: number
+  monthly_fee_usd?: number
   fee_waiver?: string
-  overdraft: string
-  courtesy_pay_limit_after_90_days_usd: number | null
-  early_direct_deposit: string
-  daily_atm_cash_limit_usd: number | null
-  check_writing: boolean | null
+  overdraft?: string
+  courtesy_pay_limit_after_90_days_usd?: number | null
+  early_direct_deposit?: string
+  daily_atm_cash_limit_usd?: number | null
+  check_writing?: boolean | null
   eligibility: string
   perks?: string[]
 }
 
 const referenceJson = productReference.match(/```json\s*([\s\S]*?)```/)?.[1]
 if (!referenceJson) throw new Error('UFCU product reference is missing its machine-readable data block.')
-const reference = JSON.parse(referenceJson) as { as_of: string; checking: ProductReferenceAccount[] }
+const reference = JSON.parse(referenceJson) as { as_of: string; checking: ProductReferenceAccount[]; savings?: ProductReferenceAccount[] }
 export const productReferenceDate = reference.as_of
-export const productReferenceAccounts = reference.checking
+export const productReferenceAccounts = [...reference.checking, ...(reference.savings ?? [])]
 
 export const accounts: Account[] = [
   {
