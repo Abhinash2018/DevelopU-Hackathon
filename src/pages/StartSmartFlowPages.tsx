@@ -34,7 +34,7 @@ const journeySteps = [
 ]
 
 export function RecommendationPage() {
-  const { profile, preferences, setOnboardingStage } = useMember()
+  const { profile, preferences, selectedCard, setSelectedCard, setOnboardingStage } = useMember()
   const navigate = useNavigate()
 
   if (!profile) return <Navigate to="/" replace />
@@ -46,6 +46,15 @@ export function RecommendationPage() {
 
   return <FlowShell step="02 of 04" eyebrow="SMART START RECOMMENDATION" title={`A clear starting point for you, ${profile.firstName}.`} description="We used the areas you selected to organize the first steps of your UFCU journey.">
     <div className="flow-selection-note"><Icon name="checkCircle" size={18} /><span><strong>Based on what you told us</strong><small>{preferences.map(preference => preferenceLabels[preference]).join(' · ')}</small></span></div>
+    <section className="eligible-cards" aria-labelledby="eligible-cards-title">
+      <div className="flow-section-heading"><p className="member-eyebrow">CARDS DESIGNED FOR U</p><h2 id="eligible-cards-title">You’re eligible to choose these card designs</h2><p>Make it yours. Pick your school spirit or keep it classic.</p></div>
+      <p className="card-eligibility-note">Available in this demo with your recommended checking account. Final eligibility is confirmed when your account is approved.</p>
+      <fieldset className="card-design-grid"><legend className="sr-only">Choose your debit card design</legend>{[
+        { id: 'texas', name: 'The University of Texas', detail: 'Hook ’em, Horns!' },
+        { id: 'texas-state', name: 'Texas State University', detail: 'Go Bobcats!' },
+        { id: 'classic', name: 'UFCU Classic', detail: 'A classic. Unmistakably you.' },
+      ].map(card => <label key={card.id} className={`card-design-option ${selectedCard === card.id ? 'is-selected' : ''}`}><img src={`/images/cards/${card.id}.png`} alt={`${card.name} debit card`} /><span className="card-design-name"><input type="radio" name="card-design" value={card.id} checked={selectedCard === card.id} onChange={() => setSelectedCard(card.id)} />{card.name}</span><small>{card.detail}</small><span className="card-design-status"><Icon name="checkCircle" size={15} />{selectedCard === card.id ? 'Selected for you' : 'Eligible design'}</span></label>)}</fieldset>
+    </section>
     <div className="flow-section-heading"><p className="member-eyebrow">YOUR RECOMMENDED JOURNEY</p><h2>Start with the essentials</h2></div>
     <div className="journey-card-grid">{journeySteps.map(step => <article className="journey-card" key={step.title}><span className="journey-card-icon"><Icon name={step.icon} size={21} /></span><div><strong>{step.title}</strong><p>{step.description}</p></div><Icon name="checkCircle" size={17} className="journey-card-check" /></article>)}</div>
     <div className="secure-handoff flow-disclosure"><Icon name="shield" size={20} /><div><strong>Keep control of your setup</strong><p>You can skip optional steps, review every detail, and return to the dashboard whenever you are ready.</p></div></div>
@@ -54,7 +63,7 @@ export function RecommendationPage() {
 }
 
 export function IdentityReviewPage() {
-  const { profile, preferences, consentAccepted, setConsentAccepted, setOnboardingStage } = useMember()
+  const { profile, preferences, selectedCard, consentAccepted, setConsentAccepted, setOnboardingStage } = useMember()
   const navigate = useNavigate()
   const [confirmed, setConfirmed] = useState(false)
   const [error, setError] = useState('')
@@ -73,7 +82,7 @@ export function IdentityReviewPage() {
 
   return <FlowShell step="03 of 04" eyebrow="SECURE INFORMATION REVIEW" title="Review before we continue." description="Check the information you entered and choose what happens next.">
     <div className="review-warning"><Icon name="lock" size={19} /><div><strong>Only masked identity details are shown</strong><p>We only keep the identification type and last-four values in this local experience. A live credit union application uses secure identity verification.</p></div></div>
-    <section className="flow-review-card" aria-labelledby="personal-review-title"><div className="flow-card-title"><div><p className="member-eyebrow">PERSONAL INFORMATION</p><h2 id="personal-review-title">Your member profile</h2></div><button type="button" className="member-text-button" onClick={() => navigate('/signup')}>Edit</button></div><div className="flow-detail-grid"><ReviewDetail label="Full name" value={`${profile.firstName} ${profile.lastName}`} /><ReviewDetail label="Date of birth" value={formatDate(profile.dateOfBirth)} /><ReviewDetail label="Email" value={profile.email} /><ReviewDetail label="Phone" value={profile.phone} /><ReviewDetail label="Address" value={`${profile.street}, ${profile.city}, ${profile.state} ${profile.zip}`} /><ReviewDetail label="Identification" value={`${profile.identificationType ? identificationLabels[profile.identificationType] : 'Not provided'} · •••• ${profile.identificationLast4}`} /><ReviewDetail label="SSN" value={`•••• ${profile.ssnLast4}`} /><ReviewDetail label="Selected priorities" value={preferences.map(preference => preferenceLabels[preference]).join(' · ')} /></div></section>
+    <section className="flow-review-card" aria-labelledby="personal-review-title"><div className="flow-card-title"><div><p className="member-eyebrow">PERSONAL INFORMATION</p><h2 id="personal-review-title">Your member profile</h2></div><button type="button" className="member-text-button" onClick={() => navigate('/signup')}>Edit</button></div><div className="flow-detail-grid"><ReviewDetail label="Full name" value={`${profile.firstName} ${profile.lastName}`} /><ReviewDetail label="Date of birth" value={formatDate(profile.dateOfBirth)} /><ReviewDetail label="Email" value={profile.email} /><ReviewDetail label="Phone" value={profile.phone} /><ReviewDetail label="Address" value={`${profile.street}, ${profile.city}, ${profile.state} ${profile.zip}`} /><ReviewDetail label="Identification" value={`${profile.identificationType ? identificationLabels[profile.identificationType] : 'Not provided'} · •••• ${profile.identificationLast4}`} /><ReviewDetail label="SSN" value={`•••• ${profile.ssnLast4}`} /><ReviewDetail label="Debit card design" value={({ texas: "The University of Texas", "texas-state": "Texas State University", classic: "UFCU Classic" } as Record<string, string>)[selectedCard]} /><ReviewDetail label="Selected priorities" value={preferences.map(preference => preferenceLabels[preference]).join(' · ')} /></div></section>
     <form className="flow-consent-card" onSubmit={submit}>
       <label className="flow-checkbox"><input type="checkbox" checked={confirmed} onChange={event => { setConfirmed(event.target.checked); setError('') }} /><span><strong>I confirm the information above is accurate.</strong><small>For a live application, UFCU may ask for additional verified documentation.</small></span></label>
       <label className="flow-checkbox"><input type="checkbox" checked={consentAccepted} onChange={event => { setConsentAccepted(event.target.checked); setError('') }} /><span><strong>I consent to continue this member setup review.</strong><small>This button advances the local onboarding flow; it does not submit a real credit application.</small></span></label>

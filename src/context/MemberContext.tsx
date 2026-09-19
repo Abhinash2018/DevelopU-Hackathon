@@ -8,6 +8,8 @@ type MemberContextValue = {
   onboardingStage: OnboardingStage
   membershipDecision: MembershipDecision
   consentAccepted: boolean
+  selectedCard: string
+  setSelectedCard: (card: string) => void
   cardActivated: boolean
   signIn: (email: string, password: string) => boolean
   createAccount: (profile: SignUpProfile) => void
@@ -46,6 +48,7 @@ export function MemberProvider({ children }: { children: ReactNode }) {
   const [onboardingStage, setOnboardingStage] = useState<OnboardingStage>('PROFILE')
   const [membershipDecision, setMembershipDecision] = useState<MembershipDecision>('pending')
   const [consentAccepted, setConsentAccepted] = useState(false)
+  const [selectedCard, setSelectedCard] = useState('classic')
   const [cardActivated, setCardActivated] = useState(false)
 
   const signIn = useCallback((email: string, password: string) => {
@@ -58,6 +61,7 @@ export function MemberProvider({ children }: { children: ReactNode }) {
   const createAccount = useCallback((newProfile: SignUpProfile) => {
     const { password: _password, ...memberProfile } = newProfile
     setProfile(memberProfile)
+    setSelectedCard('classic')
     setPreferencesState([])
     setOnboardingStage('MATCH')
     setMembershipDecision('pending')
@@ -92,6 +96,8 @@ export function MemberProvider({ children }: { children: ReactNode }) {
     onboardingStage,
     membershipDecision,
     consentAccepted,
+    selectedCard,
+    setSelectedCard,
     cardActivated,
     signIn,
     createAccount,

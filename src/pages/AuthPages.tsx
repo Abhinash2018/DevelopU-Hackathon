@@ -5,6 +5,7 @@ import { Icon } from '../components/common/Icon'
 import { FormField, SelectField } from '../components/forms/FormField'
 import { MemberSetupShell } from '../components/layout/MemberSetupShell'
 import { useMember } from '../context/MemberContext'
+import { IdentityImageUpload } from '../components/forms/IdentityImageUpload'
 import { states } from '../data/states'
 import type { OnboardingStage, SignUpProfile } from '../types/member'
 
@@ -134,6 +135,7 @@ export function CreateAccountPage() {
           <FormField id="signup-city" label="City" value={form.city} onChange={event => set('city', event.target.value)} error={errors.city} required />
           <SelectField id="signup-state" label="State" value={form.state} onChange={event => set('state', event.target.value)} error={errors.state} required><option value="">Select a state</option>{states.map(([code, name]) => <option key={code} value={code}>{name}</option>)}</SelectField>
           <FormField id="signup-zip" label="ZIP code" inputMode="numeric" value={form.zip} onChange={event => set('zip', event.target.value)} error={errors.zip} required />
+          <IdentityImageUpload />
           <SelectField id="identificationType" label="Identification type" value={form.identificationType} onChange={event => set('identificationType', event.target.value)} error={errors.identificationType} required>
             <option value="">Select an ID type</option>
             <option value="drivers-license">Driver&apos;s license</option>
@@ -147,7 +149,7 @@ export function CreateAccountPage() {
           <FormField id="signup-password" label="Create password" type="password" value={form.password} onChange={event => set('password', event.target.value)} error={errors.password} hint="Use at least eight characters." required />
           <FormField id="confirmPassword" label="Confirm password" type="password" value={confirmPassword} onChange={event => { setConfirmPassword(event.target.value); setErrors(current => ({ ...current, confirmPassword: '' })) }} error={errors.confirmPassword} required />
         </div>
-        <div className="privacy-note"><Icon name="lock" size={17} /><p><strong>Identity protection</strong><br />Only an identification type and last-four values are used in this local flow. Never enter a full SSN, full ID number, ID photo, or banking password here.</p></div>
+        <div className="privacy-note"><Icon name="lock" size={17} /><p><strong>Identity protection</strong><br />Your image is previewed locally and is not uploaded to a server. Use a sample image for this walkthrough and enter only the last four digits of your identification numbers.</p></div>
         <div className="setup-actions"><Link to="/" className="button button-text"><Icon name="back" size={18} /> Back</Link><Button type="submit">Continue <Icon name="arrow" size={18} /></Button></div>
       </form>
       <p className="auth-switch">Already a member? <Link to="/">Sign in</Link></p>
