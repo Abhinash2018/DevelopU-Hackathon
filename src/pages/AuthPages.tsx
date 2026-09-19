@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import { Button } from '../components/common/Button'
 import { Icon } from '../components/common/Icon'
 import { FormField, SelectField } from '../components/forms/FormField'
@@ -7,34 +7,11 @@ import { MemberSetupShell } from '../components/layout/MemberSetupShell'
 import { useMember } from '../context/MemberContext'
 import { IdentityImageUpload } from '../components/forms/IdentityImageUpload'
 import { states } from '../data/states'
-import type { OnboardingStage, SignUpProfile } from '../types/member'
-
-function getResumePath(stage: OnboardingStage) {
-  switch (stage) {
-    case 'PROFILE':
-    case 'MATCH':
-      return '/preferences'
-    case 'RECOMMENDATION':
-      return '/recommendation'
-    case 'REVIEW':
-    case 'TRUST':
-      return '/identity-review'
-    case 'PROCESSING':
-      return '/membership-processing'
-    case 'MEMBERSHIP_READY':
-    case 'ACTIVATE':
-      return '/membership-ready'
-    case 'NEEDS_REVIEW':
-      return '/membership-needs-review'
-    default:
-      return '/dashboard'
-  }
-}
+import type { SignUpProfile } from '../types/member'
 
 export function LoginPage() {
   const navigate = useNavigate()
-  const location = useLocation()
-  const { signIn, onboardingStage } = useMember()
+  const { signIn } = useMember()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -46,8 +23,7 @@ export function LoginPage() {
       setError('Enter your email and a password with at least four characters.')
       return
     }
-    const from = (location.state as { from?: string } | null)?.from
-    navigate(onboardingStage === 'COMPLETE' && from ? from : getResumePath(onboardingStage), { replace: true })
+    navigate('/dashboard', { replace: true })
   }
 
   return <MemberSetupShell>

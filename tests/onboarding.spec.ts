@@ -133,3 +133,17 @@ test('ID image preview validates files and can be replaced or removed', async ({
   await page.getByRole('button', { name: 'Remove image' }).click()
   await expect(page.getByAltText('Selected identification preview')).toHaveCount(0)
 })
+
+
+test('sign-in opens the dashboard directly, including after sign-out', async ({ page }) => {
+  await page.goto('/preferences')
+  await expect(page.getByRole('heading', { name: 'Welcome back.' })).toBeVisible()
+  for (let attempt = 0; attempt < 2; attempt++) {
+    await page.getByLabel('Email or username').fill('member@example.com')
+    await page.getByLabel('Password', { exact: true }).fill('demo-password')
+    await page.getByRole('button', { name: 'Sign in', exact: true }).click()
+    await expect(page).toHaveURL(/\/dashboard$/)
+    await expect(page.getByRole('heading', { name: 'Good morning, Ayush.' })).toBeVisible()
+    if (attempt === 0) await page.getByRole('button', { name: 'Sign out' }).click()
+  }
+})
