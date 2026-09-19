@@ -344,3 +344,19 @@ input[type="checkbox"], input[type="radio"] { width: 18px; height: 18px; flex-sh
 .income-range legend span { color: #64748b; font-weight: 400; }
 .income-range-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
 @media (max-width: 560px) { .income-range-fields { grid-template-columns: 1fr; } .financial-background { padding: 18px; } }
+.offer-card-button { width: 100%; text-align: left; border: 0; border-top: 1px solid #eff2f6; background: transparent; font: inherit; cursor: pointer; }
+.offer-card-button:hover { background: #f5f9fc; }
+.offer-card-button:focus-visible, button.map-pin:focus-visible { outline: 3px solid #087db6; outline-offset: 3px; }
+.offer-card-copy { display: grid; gap: 4px; }
+.offer-summary { color: #53657d; font-size: 11px; }
+button.map-pin { cursor: pointer; padding: 0; }
+button.map-pin::after { content: ''; position: absolute; inset: -14px; }
+.offer-detail-hero { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+.offer-detail-hero > .merchant-logo { flex-shrink: 0; width: 48px; height: 48px; }
+.offer-detail-hero strong { font-size: 20px; color: #173753; }
+.offer-detail-hero p { color: #64748b; font-size: 12px; margin-top: 5px; }
+.offer-demo-label { display: inline-block; background: #fff0e4; color: #974214; padding: 5px 10px; border-radius: 5px; font-size: 12px; margin-bottom: 14px; }
+.offer-detail-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; background: #f5f8fb; padding: 16px; border-radius: 10px; margin: 20px 0; }
+.offer-detail-meta dt { font-size: 12px; color: #64748b; }
+.offer-detail-meta dd { margin: 5px 0 0; font-weight: 600; }
+.offer-detail-note { font-size: 12px; color: #64748b; margin-top: 18px; }

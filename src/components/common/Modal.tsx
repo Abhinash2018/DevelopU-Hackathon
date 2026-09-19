@@ -2,7 +2,7 @@ import { useEffect, useId, useRef, type ReactNode } from 'react'
 import { Button } from './Button'
 import { Icon } from './Icon'
 
-export function Modal({ title, children, onClose }: { title: string; children: ReactNode; onClose: () => void }) {
+export function Modal({ title, children, onClose, eyebrow = "A LOOK AHEAD", closeLabel = "Back to accounts" }: { title: string; children: ReactNode; onClose: () => void; eyebrow?: string; closeLabel?: string }) {
   const ref = useRef<HTMLDialogElement>(null)
   const titleId = useId()
   useEffect(() => {
@@ -14,11 +14,11 @@ export function Modal({ title, children, onClose }: { title: string; children: R
 
   return <dialog ref={ref} className="modal" aria-labelledby={titleId} onCancel={event => { event.preventDefault(); onClose() }}>
     <div className="flex items-start justify-between gap-4">
-      <span className="eyebrow">A LOOK AHEAD</span>
+      <span className="eyebrow">{eyebrow}</span>
       <button className="icon-button" onClick={onClose} aria-label="Close dialog"><Icon name="close" /></button>
     </div>
     <h2 id={titleId}>{title}</h2>
     <div className="modal-content">{children}</div>
-    <Button onClick={onClose}>Back to accounts <Icon name="back" /></Button>
+    <Button onClick={onClose}>{closeLabel} <Icon name="back" /></Button>
   </dialog>
 }

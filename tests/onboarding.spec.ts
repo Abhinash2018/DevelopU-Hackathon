@@ -160,3 +160,29 @@ test('sign-in opens the dashboard directly, including after sign-out', async ({ 
     if (attempt === 0) await page.getByRole('button', { name: 'Sign out' }).click()
   }
 })
+
+test('merchant rows and map pins open their own offer details', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/')
+  await page.getByLabel('Email or username').fill('member@example.com')
+  await page.getByLabel('Password', { exact: true }).fill('demo-password')
+  await page.getByRole('button', { name: 'Sign in', exact: true }).click()
+  await page.getByRole('main').getByRole('link', { name: 'Nearby Offers' }).click()
+  await page.getByRole('button', { name: 'Allow once' }).click()
+  for (const [merchant, headline] of [['H-E-B', '$5 back on groceries'], ['Target', '10% back on your next shop'], ['Local Coffee', '$2 off your coffee break']]) {
+    const trigger = page.getByRole('button', { name: `View ${merchant} offer`, exact: true })
+    await trigger.click()
+    const dialog = page.getByRole('dialog', { name: `${merchant} offer` })
+    await expect(dialog).toBeVisible()
+    await expect(dialog.getByText(headline, { exact: true })).toBeVisible()
+    await expect(dialog.getByText('Demo offer · Not redeemable')).toBeVisible()
+    expect(await dialog.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true)
+    await page.keyboard.press('Escape')
+    await expect(dialog).toHaveCount(0)
+    await expect(trigger).toBeFocused()
+    await page.getByRole('button', { name: `View ${merchant} offer on map`, exact: true }).click()
+    await expect(dialog).toBeVisible()
+    await dialog.getByRole('button', { name: 'Back to offers' }).click()
+    await expect(dialog).toHaveCount(0)
+  }
+})
