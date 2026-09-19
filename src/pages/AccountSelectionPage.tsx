@@ -32,6 +32,9 @@ type HelpAnswers = {
   situation: 'working' | 'student' | 'both' | ''
   income: 'lower' | 'steady' | 'higher' | ''
   balance: 'lower' | 'growing' | 'higher' | ''
+  primaryUse: 'spending' | 'emergency' | 'saving' | 'retirement' | ''
+  access: 'anytime' | 'some' | 'locked' | ''
+  openingDeposit: 'small' | 'medium' | 'large' | ''
   overdraft: 'protect' | 'occasionally' | 'not_concerned' | ''
   priority: 'simple' | 'flexible' | 'extras' | ''
   primaryGoal: ServiceId | ''
@@ -42,7 +45,7 @@ type HelpAnswers = {
 type ServiceId = keyof typeof serviceLabels
 
 const initialHelpAnswers: HelpAnswers = {
-  situation: '', income: '', balance: '', overdraft: '', priority: '', primaryGoal: '', services: [], habits: '',
+  situation: '', income: '', balance: '', primaryUse: '', access: '', openingDeposit: '', overdraft: '', priority: '', primaryGoal: '', services: [], habits: '',
 }
 
 function recommendAccounts(answers: HelpAnswers) {
@@ -51,33 +54,42 @@ function recommendAccounts(answers: HelpAnswers) {
     .map(account => ({ account, score: 0 }))
   const product = (id: string) => productReferenceAccounts.find(item => item.id === id)
   const category = (id: string) => accounts.find(account => account.id === id)?.category
-  const scoreCategory = (target: Account['category'], points: number) => {
-    scores.filter(item => item.account.category === target).forEach(item => { item.score += points })
-  }
   const score = (id: string, points: number) => {
     const match = scores.find(item => item.account.id === id)
     if (match) match.score += points
   }
-  const goalCategories: Partial<Record<ServiceId, Account['category']>> = {
-    'everyday-banking': 'CHECKING', 'save-goals': 'SAVINGS', 'larger-savings': 'MONEY MARKET',
-    'term-savings': 'CDS', retirement: 'IRAS', overdraft: 'CHECKING', digital: 'CHECKING',
+  const scoreProducts = (ids: string[], points: number) => ids.forEach(id => score(id, points))
+  const goalProducts: Partial<Record<ServiceId, string[]>> = {
+    'everyday-banking': ['free-checking', 'simply-u', 'plus-checking'],
+    'save-goals': ['savings', 'special-savings'], 'larger-savings': ['money-market'],
+    'term-savings': ['certificates'], retirement: ['ira'], overdraft: ['simply-u'], digital: ['free-checking'],
   }
   const relationshipGoals: Partial<Record<ServiceId, string>> = {
     'credit-cards': 'plus-checking', loans: 'plus-checking', business: 'free-checking',
     insurance: 'free-checking', investments: 'ira',
   }
-  if (answers.primaryGoal && goalCategories[answers.primaryGoal]) scoreCategory(goalCategories[answers.primaryGoal]!, 35)
+  if (answers.primaryGoal && goalProducts[answers.primaryGoal]) scoreProducts(goalProducts[answers.primaryGoal]!, 35)
   if (answers.primaryGoal && relationshipGoals[answers.primaryGoal]) score(relationshipGoals[answers.primaryGoal]!, 22)
   answers.services.forEach(service => {
-    const target = goalCategories[service as ServiceId]
-    if (target) scoreCategory(target, service === answers.primaryGoal ? 15 : 8)
+    const target = goalProducts[service as ServiceId]
+    if (target) scoreProducts(target, service === answers.primaryGoal ? 15 : 8)
     const relationshipAccount = relationshipGoals[service as ServiceId]
     if (relationshipAccount) score(relationshipAccount, service === answers.primaryGoal ? 10 : 5)
   })
+  if (answers.primaryUse === 'spending') scoreProducts(['free-checking', 'simply-u', 'plus-checking'], 30)
+  if (answers.primaryUse === 'emergency') scoreProducts(['savings', 'special-savings'], 32)
+  if (answers.primaryUse === 'saving') scoreProducts(['savings', 'money-market', 'certificates'], 30)
+  if (answers.primaryUse === 'retirement') score('ira', 40)
+  if (answers.access === 'anytime') scoreProducts(['free-checking', 'simply-u', 'savings'], 18)
+  if (answers.access === 'some') scoreProducts(['savings', 'money-market'], 18)
+  if (answers.access === 'locked') scoreProducts(['certificates', 'ira'], 24)
+  if (answers.openingDeposit === 'small') scoreProducts(['simply-u', 'free-checking', 'savings'], 18)
+  if (answers.openingDeposit === 'medium') scoreProducts(['savings', 'certificates'], 15)
+  if (answers.openingDeposit === 'large') scoreProducts(['money-market', 'certificates', 'ira'], 24)
   if (answers.situation === 'student') { score('simply-u', 8); score('savings', 7) }
   if (answers.situation === 'working') score('free-checking', 4)
   if (answers.situation === 'both') { score('free-checking', 5); score('savings', 4) }
-  if (answers.income === 'lower') { score('simply-u', 8); scoreCategory('SAVINGS', 6) }
+  if (answers.income === 'lower') { score('simply-u', 8); scoreProducts(['savings', 'special-savings'], 6) }
   if (answers.income === 'steady') { score('free-checking', 5); score('savings', 5) }
   if (answers.income === 'higher') { score('plus-checking', 10); score('money-market', 12); score('certificates', 7); score('ira', 5) }
   if (answers.balance === 'lower') { score('simply-u', 6); score('savings', 7) }
@@ -105,7 +117,7 @@ function HelpMeChoose({ onChoose }: { onChoose: (account: Account) => void }) {
   const [answers, setAnswers] = useState(initialHelpAnswers)
   const [recommendation, setRecommendation] = useState<Account[] | null>(null)
   const update = <K extends keyof HelpAnswers>(key: K, value: HelpAnswers[K]) => setAnswers(previous => ({ ...previous, [key]: value }))
-  const canRecommend = answers.situation && answers.income && answers.balance && answers.overdraft && answers.priority && answers.primaryGoal
+  const canRecommend = answers.situation && answers.income && answers.balance && answers.primaryUse && answers.access && answers.openingDeposit && answers.overdraft && answers.priority && answers.primaryGoal
 
   if (recommendation) {
     const primary = recommendation[0]
@@ -120,7 +132,7 @@ function HelpMeChoose({ onChoose }: { onChoose: (account: Account) => void }) {
       <div className="recommendation-badge">YOUR MATCH</div>
       <h3>{primary.name}</h3>
       <p>{explanation}</p>
-      <p className="reference-note">Matched against UFCU product information reviewed {productReferenceDate}. This is guidance for the prototype, not an eligibility or financial advice decision.</p>
+      <p className="reference-note">Matched against UFCU product information reviewed {productReferenceDate}. This is guidance, not an eligibility or financial advice decision.</p>
       <div className="profile-summary">
         <strong>Structured profile</strong>
         <span>{answers.situation === 'student' ? 'Student' : answers.situation === 'both' ? 'Student and working' : 'Working'} · {answers.priority === 'simple' ? 'Simple banking' : answers.priority === 'flexible' ? 'Everyday flexibility' : 'Added features'}</span>
@@ -140,7 +152,7 @@ function HelpMeChoose({ onChoose }: { onChoose: (account: Account) => void }) {
   }
 
   return <form className="chooser-form" onSubmit={event => { event.preventDefault(); if (canRecommend) setRecommendation(recommendAccounts(answers)) }}>
-    <p className="chooser-intro">Answer a few questions about your life, goals, and the UFCU services you may need. We’ll turn your answers into a simple profile and match it against the products in this prototype. Nothing is saved outside this demo.</p>
+    <p className="chooser-intro">Answer a few questions about how you use money, what you are saving for, and how much access you need. We’ll compare your answers with UFCU products and show the strongest fits.</p>
     <div className="chooser-question"><p className="field-legend">Which best describes you?</p><div className="chooser-options">
       <label><input type="radio" name="situation" checked={answers.situation === 'working'} onChange={() => update('situation', 'working')} /> Working</label>
       <label><input type="radio" name="situation" checked={answers.situation === 'student'} onChange={() => update('situation', 'student')} /> Student</label>
@@ -155,6 +167,22 @@ function HelpMeChoose({ onChoose }: { onChoose: (account: Account) => void }) {
       <label><input type="radio" name="balance" checked={answers.balance === 'lower'} onChange={() => update('balance', 'lower')} /> Usually under $1,000</label>
       <label><input type="radio" name="balance" checked={answers.balance === 'growing'} onChange={() => update('balance', 'growing')} /> Growing over time</label>
       <label><input type="radio" name="balance" checked={answers.balance === 'higher'} onChange={() => update('balance', 'higher')} /> Usually over $5,000</label>
+    </div></div>
+    <div className="chooser-question"><p className="field-legend">What is the main job for this account?</p><div className="chooser-options">
+      <label><input type="radio" name="primaryUse" checked={answers.primaryUse === 'spending'} onChange={() => update('primaryUse', 'spending')} /> Everyday spending and bills</label>
+      <label><input type="radio" name="primaryUse" checked={answers.primaryUse === 'emergency'} onChange={() => update('primaryUse', 'emergency')} /> Emergency savings</label>
+      <label><input type="radio" name="primaryUse" checked={answers.primaryUse === 'saving'} onChange={() => update('primaryUse', 'saving')} /> Grow money I can set aside</label>
+      <label><input type="radio" name="primaryUse" checked={answers.primaryUse === 'retirement'} onChange={() => update('primaryUse', 'retirement')} /> Retirement savings</label>
+    </div></div>
+    <div className="chooser-question"><p className="field-legend">How soon might you need this money?</p><div className="chooser-options">
+      <label><input type="radio" name="access" checked={answers.access === 'anytime'} onChange={() => update('access', 'anytime')} /> I need access anytime</label>
+      <label><input type="radio" name="access" checked={answers.access === 'some'} onChange={() => update('access', 'some')} /> I can leave it for a while</label>
+      <label><input type="radio" name="access" checked={answers.access === 'locked'} onChange={() => update('access', 'locked')} /> I want a fixed-term or retirement option</label>
+    </div></div>
+    <div className="chooser-question"><p className="field-legend">How much would you likely open this account with?</p><div className="chooser-options">
+      <label><input type="radio" name="openingDeposit" checked={answers.openingDeposit === 'small'} onChange={() => update('openingDeposit', 'small')} /> Under $1,000</label>
+      <label><input type="radio" name="openingDeposit" checked={answers.openingDeposit === 'medium'} onChange={() => update('openingDeposit', 'medium')} /> $1,000–$2,499</label>
+      <label><input type="radio" name="openingDeposit" checked={answers.openingDeposit === 'large'} onChange={() => update('openingDeposit', 'large')} /> $2,500 or more</label>
     </div></div>
     <div className="chooser-question"><p className="field-legend">How do you feel about overdrafts?</p><div className="chooser-options">
       <label><input type="radio" name="overdraft" checked={answers.overdraft === 'protect'} onChange={() => update('overdraft', 'protect')} /> I want to avoid them</label>
@@ -201,7 +229,7 @@ export function AccountSelectionPage() {
         <div className="account-grid">{visibleAccounts.map(account => <AccountCard key={account.id} account={account} selected={data.selectedAccounts.includes(account.id)} onToggle={() => toggle(account.id)} onLearnMore={() => setModal(account)} error={errors.selectedAccounts} />)}</div>
         {errors.selectedAccounts && <p id="accounts-error" className="field-error">{errors.selectedAccounts}</p>}
       </fieldset>
-      <p className="fine-print">Illustrative product information for this prototype. Features, eligibility, and terms are not verified offers.</p>
+      <p className="fine-print">Product information and eligibility may vary. Review current UFCU terms before opening an account.</p>
       <FormActions back="/apply/address" />
     </form>
     {modal && <Modal title={modal === 'help' ? 'Find an account that fits you.' : modal.name} onClose={() => setModal(null)}>

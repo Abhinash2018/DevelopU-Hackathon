@@ -16,8 +16,8 @@ export function ProcessingPage() {
     <div className="loading-ring" aria-hidden="true"><Icon name="bank" size={32} /></div>
     <p className="eyebrow">YOUR NEXT CHAPTER IS ALMOST HERE</p>
     <h1>Creating your UFCU account...</h1>
-    <p role="status">We’re putting the finishing touches on your demo application.</p>
+    <p role="status">We’re putting the finishing touches on your new account.</p>
     <div className="security-tip"><span className="feature-icon"><Icon name="shield" size={25} /></span><p className="eyebrow">A MOMENT FOR YOUR SECURITY</p><p className="tip-text" aria-live="polite" aria-atomic="true">{securityTips[tipIndex]}</p><div className="tip-dots" aria-hidden="true">{securityTips.map((_, index) => <span key={index} className={index === tipIndex ? 'active' : ''} />)}</div></div>
-    <p className="fine-print">This takes about six seconds. No application is sent to UFCU.</p>
+    <p className="fine-print">This takes about six seconds. Please keep this window open.</p>
   </div>
 }
