@@ -48,9 +48,11 @@ const initialHelpAnswers: HelpAnswers = {
   situation: '', income: '', balance: '', primaryUse: '', access: '', openingDeposit: '', overdraft: '', priority: '', primaryGoal: '', services: [], habits: '',
 }
 
+const recommendationExcludedAccountIds = ['teen-checking', 'teen-kidz-savings'] as const
+
 function recommendAccounts(answers: HelpAnswers) {
   const scores = accounts
-    .filter(account => !['teen-checking', 'teen-kidz-savings'].includes(account.id))
+    .filter(account => !recommendationExcludedAccountIds.includes(account.id as typeof recommendationExcludedAccountIds[number]))
     .map(account => ({ account, score: 0 }))
   const product = (id: string) => productReferenceAccounts.find(item => item.id === id)
   const category = (id: string) => accounts.find(account => account.id === id)?.category
@@ -110,7 +112,8 @@ function recommendAccounts(answers: HelpAnswers) {
   if (habits.includes('emergency')) score('savings', 12)
   const monthlyFee = product('plus-checking')?.monthly_fee_usd ?? 0
   if (answers.income !== 'higher' && answers.balance !== 'higher' && monthlyFee > 0) score('plus-checking', -8)
-  return scores.sort((a, b) => b.score - a.score || (category(a.account.id) ?? '').localeCompare(category(b.account.id) ?? '')).map(item => item.account)
+  const ranked = scores.sort((a, b) => b.score - a.score || (category(a.account.id) ?? '').localeCompare(category(b.account.id) ?? ''))
+  return ranked[0]?.score > 0 ? ranked.map(item => item.account) : []
 }
 
 function HelpMeChoose({ onChoose }: { onChoose: (account: Account) => void }) {
@@ -119,7 +122,7 @@ function HelpMeChoose({ onChoose }: { onChoose: (account: Account) => void }) {
   const update = <K extends keyof HelpAnswers>(key: K, value: HelpAnswers[K]) => setAnswers(previous => ({ ...previous, [key]: value }))
   const canRecommend = answers.situation && answers.income && answers.balance && answers.primaryUse && answers.access && answers.openingDeposit && answers.overdraft && answers.priority && answers.primaryGoal
 
-  if (recommendation) {
+  if (recommendation?.length) {
     const primary = recommendation[0]
     const explanation = primary.id === 'simply-u'
       ? 'Your answers point to straightforward spending with no overdraft fees and no spending beyond deposited funds.'
@@ -148,6 +151,16 @@ function HelpMeChoose({ onChoose }: { onChoose: (account: Account) => void }) {
           <Button variant={index === 0 ? 'primary' : 'secondary'} onClick={() => onChoose(account)}>{index === 0 ? 'Choose this account' : 'Choose'}</Button>
         </div>)}
       </div>
+    </div>
+  }
+
+  if (recommendation) {
+    return <div className="chooser-result">
+      <div className="recommendation-badge">NO CLEAR MATCH</div>
+      <h3>Let’s compare a few options together.</h3>
+      <p>Your answers did not point to a single standout account in this prototype, so review the recommended tab and compare the options before choosing.</p>
+      <p className="reference-note">This prototype does not make an eligibility or financial advice decision.</p>
+      <Button variant="secondary" type="button" onClick={() => setRecommendation(null)}>Adjust my answers</Button>
     </div>
   }
 

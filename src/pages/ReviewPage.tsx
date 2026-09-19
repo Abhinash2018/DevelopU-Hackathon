@@ -18,19 +18,19 @@ export function ReviewPage() {
   const { errors, onSubmit } = useStepForm(6, () => { if (submit()) navigate('/apply/processing', { replace: true }) })
   const { personalInfo: person, contactInfo: contact, address } = data
   return <>
-    <PageHeading eyebrow="ONE LAST LOOK" title="Ready when you are." description="Check your information, then review the disclosures before submitting your application." />
+    <PageHeading eyebrow="ONE LAST LOOK" title="Ready when you are." description="Check your information, then review the sample disclosures to finish your demo application." />
     <div className="review-summary">
       <ReviewSection title="Personal information" to="/apply/personal"><p>{[person.firstName, person.middleName, person.lastName].filter(Boolean).join(' ')}</p><p className="muted">Date of birth: {new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' }).format(new Date(`${person.dateOfBirth}T12:00:00`))}</p></ReviewSection>
       <ReviewSection title="Contact information" to="/apply/contact"><p>{contact.email}</p><p>{contact.phone}</p></ReviewSection>
       <ReviewSection title="Address" to="/apply/address"><p>{address.street}{address.apartment && `, ${address.apartment}`}</p><p>{address.city}, {address.state} {address.zip}</p></ReviewSection>
       <ReviewSection title="Selected accounts" to="/apply/accounts">{accounts.filter(account => data.selectedAccounts.includes(account.id)).map(account => <p key={account.id}>{account.name}</p>)}</ReviewSection>
-      <ReviewSection title="Funding method" to="/apply/funding"><p>{fundingMethods.find(method => method.id === data.funding.method)?.name}</p>{data.funding.method === 'bank' && <p>{data.funding.demoBank.replace('Demo ', '').replace('Sample ', '')}</p>}<p className="muted">{formatMoney(data.funding.amount)} total opening deposit</p></ReviewSection>
+      <ReviewSection title="Funding method" to="/apply/funding"><p>{fundingMethods.find(method => method.id === data.funding.method)?.name}</p>{data.funding.method === 'bank' && <p>{data.funding.demoBank}</p>}<p className="muted">{formatMoney(data.funding.amount)} total simulated deposit</p></ReviewSection>
     </div>
     <form noValidate onSubmit={onSubmit}>
-      <div className="disclosures"><h2>Disclosures & consent</h2><div className="sample-disclosure"><strong>Account terms and privacy information</strong><p>Review the account terms, fee schedules, privacy information, and electronic-delivery disclosures before continuing.</p></div>
+      <div className="disclosures"><h2>Disclosures & consent</h2><div className="sample-disclosure"><strong>Placeholder disclosures — for demonstration only</strong><p>In a live application, account terms, fee schedules, privacy information, and electronic-delivery disclosures would be provided here. This sample is not a legal agreement and does not open an account.</p></div>
         <div className="space-y-5">
-          <CheckboxField id="disclosuresAccepted" checked={data.disclosuresAccepted} onChange={value => update('disclosuresAccepted', value)} error={errors.disclosuresAccepted}>I have read and accept the disclosures.</CheckboxField>
-          <CheckboxField id="consentAccepted" checked={data.consentAccepted} onChange={value => update('consentAccepted', value)} error={errors.consentAccepted}>I consent to submitting this application and opening the selected accounts.</CheckboxField>
+          <CheckboxField id="disclosuresAccepted" checked={data.disclosuresAccepted} onChange={value => update('disclosuresAccepted', value)} error={errors.disclosuresAccepted}>I have read and accept the sample disclosures for this prototype.</CheckboxField>
+          <CheckboxField id="consentAccepted" checked={data.consentAccepted} onChange={value => update('consentAccepted', value)} error={errors.consentAccepted}>I consent to submitting this simulated application. I understand that no real account will be created.</CheckboxField>
         </div>
       </div>
       <FormActions back="/apply/funding" label="Submit Application" />
