@@ -1,48 +1,60 @@
-import { useState } from 'react'
 import { Link } from 'react-router'
-import ufcuLogo from '../assets/ufcu-logo-oval.png'
+import { Icon } from '../components/common/Icon'
+import { useMember } from '../context/MemberContext'
 
-const navigation = ['Overview', 'Accounts', 'Move Money', 'Smart Switch', 'Direct Deposit', 'Cards & Wallet', 'Financial Insights', 'Nearby Offers', 'Goals', 'Learn', 'Profile']
-const actions = ['Move Money', 'Smart Switch', 'Direct Deposit', 'Apple Wallet', 'Insights', 'Nearby Offers', 'Ask TrustNav']
 const payments = [
-  ['Paycheck — Acme Corp', 'Nov 29 · Bi-weekly', '+$1,842.50', 'Incoming'],
-  ['Netflix', 'Nov 30 · Monthly', '-$15.99', 'Review needed'],
-  ['Spotify', 'Dec 1 · Monthly', '-$10.99', 'Moved to UFCU'],
-  ['Phone Bill — AT&T', 'Dec 3 · Monthly', '-$65.00', 'Review needed'],
-  ['Rent', 'Dec 1 · Monthly', '-$1,250.00', 'Manual required'],
-  ['Austin Energy', 'Dec 5 · Monthly', '-$89.00', 'Review needed'],
-  ['Planet Fitness', 'Dec 7 · Monthly', '-$30.00', 'Review needed'],
+  { name: 'Paycheck', detail: 'Acme Corporation · Bi-weekly', date: 'Nov 29', amount: '+$1,842.50', tone: 'income', status: 'Incoming', icon: 'arrowDown' as const },
+  { name: 'Netflix', detail: 'Monthly subscription', date: 'Nov 30', amount: '-$15.49', tone: 'payment', status: 'Review needed', icon: 'repeat' as const },
+  { name: 'Spotify', detail: 'Monthly subscription', date: 'Dec 1', amount: '-$11.99', tone: 'payment', status: 'Moved to UFCU', icon: 'repeat' as const },
+  { name: 'Phone bill', detail: 'Monthly payment', date: 'Dec 3', amount: '-$65.00', tone: 'payment', status: 'Review needed', icon: 'card' as const },
+  { name: 'Rent', detail: 'Monthly payment', date: 'Dec 1', amount: '-$1,200.00', tone: 'payment', status: 'Manual action', icon: 'building' as const },
+  { name: 'Austin Energy', detail: 'Variable payment', date: 'Dec 5', amount: '-$89.00', tone: 'payment', status: 'Review needed', icon: 'transfer' as const },
 ]
-const activity = [['HEB Grocery', 'Nov 25 · Food', '$48.32'], ['Acme Corp', 'Nov 22 · Income', '+$1842.50'], ["Torchy’s Tacos", 'Nov 21 · Food', '$14.90'], ['Shell Gas', 'Nov 20 · Transport', '$41.00'], ['Amazon', 'Nov 19 · Shopping', '$32.99']]
 
-function Glyph({ children }: { children: string }) { return <span className="dash-glyph" aria-hidden="true">{children}</span> }
+const activity = [
+  ['H-E-B Grocery', 'Nov 25 · Food', '$48.32'],
+  ['Acme Corporation', 'Nov 22 · Income', '+$1,842.50'],
+  ["Torchy's Tacos", 'Nov 21 · Food', '$14.90'],
+  ['Shell Gas', 'Nov 20 · Transport', '$41.00'],
+  ['Amazon', 'Nov 19 · Shopping', '$32.18'],
+]
+
+const quickActions = [
+  { to: '/dashboard?sheet=move-money', label: 'Move Money', icon: 'transfer' as const },
+  { to: '/smart-switch', label: 'Smart Switch', icon: 'repeat' as const },
+  { to: '/direct-deposit', label: 'Direct Deposit', icon: 'building' as const },
+  { to: '/cards-wallet', label: 'Add to Wallet', icon: 'wallet' as const },
+  { to: '/financial-insights', label: 'Financial Insights', icon: 'chart' as const },
+  { to: '/nearby-offers', label: 'Nearby Offers', icon: 'pin' as const },
+  { to: '/learn-ai', label: 'Learn AI', icon: 'shield' as const },
+]
 
 export function DashboardPage() {
-  const [active, setActive] = useState('Overview')
-  const [notice, setNotice] = useState('')
-  return <div className="dashboard-shell">
-    <aside className="dashboard-sidebar">
-      <Link to="/" className="dashboard-logo"><img src={ufcuLogo} alt="UFCU" /></Link>
-      <nav aria-label="Dashboard navigation">{navigation.map((item, index) => <button key={item} className={active === item ? 'dashboard-nav active' : 'dashboard-nav'} onClick={() => setActive(item)}><Glyph>{['▦', '▣', '↔', '⟳', '▥', '▭', '⌁', '⌖', '◎', '▯', '♙'][index]}</Glyph>{item}</button>)}</nav>
-      <button className="member-card" onClick={() => setActive('Profile')}><span>AP</span><strong>Ayush Patel<small>Member #00124</small></strong><b>›</b></button>
-    </aside>
-    <main className="dashboard-main">
-      <header className="dashboard-topbar"><div><span>Good morning,</span><strong>Ayush Patel</strong></div><div className="topbar-tools"><button aria-label="Search">⌕</button><button aria-label="Notifications">♧<i /></button><button className="avatar" aria-label="Profile">AP</button></div></header>
-      <div className="dashboard-content">
-        <section className="dashboard-welcome"><h1>Good morning, Ayush.</h1><p>Here are your next best steps.</p></section>
-        <section className="metric-grid" aria-label="Account overview">
-          <Metric label="Total Balance" value="$8,214.53" note="↗ +2.4%" accent /><Metric label="Checking" value="$3,842.10" note="Everyday Checking •• 4821" /><Metric label="Savings" value="$4,372.43" note="Smart Savings •• 6104" />
-          <Metric label="Safe to Spend" value="$1,240.00" note="After bills & goals" /><Metric label="Next Paycheck" value="$1,842.50" note="Expected Nov 29" /><div className="metric-card journey"><span>Journey</span><strong>74%</strong><small>4 of 5 steps done</small><div><i /></div></div>
-        </section>
-        <section className="quick-actions"><h2>Quick actions</h2><div>{actions.map((action, index) => <button key={action} onClick={() => setNotice(`${action} is ready for your dashboard flow.`)}><span>{['↗', '⟳', '▥', '▭', '⌁', '⌖', '◯'][index]}</span>{action}</button>)}</div></section>
-        {notice && <p className="dashboard-notice" role="status">{notice}<button onClick={() => setNotice('')} aria-label="Dismiss message">×</button></p>}
-        <section className="dashboard-lower"><div className="upcoming panel"><div className="panel-heading"><h2>Upcoming payments</h2><button onClick={() => setNotice('Payment management opened.')}>Manage all</button></div>{payments.map((payment, index) => <div className="payment-row" key={payment[0]}><span className={index === 0 ? 'payment-icon incoming' : 'payment-icon'}>{index === 0 ? '↙' : '▭'}</span><div><strong>{payment[0]}</strong><small>{payment[1]}</small></div><div className={index === 0 ? 'payment-value positive' : 'payment-value'}><strong>{payment[2]}</strong><span className={payment[3] === 'Moved to UFCU' || payment[3] === 'Incoming' ? 'good' : 'warning'}>{payment[3]}</span></div></div>)}</div>
-          <div className="side-panels"><section className="panel setup"><h2>Setup progress</h2>{['Account opened', 'Digital card issued', 'Direct deposit submitted', 'Smart Switch started', 'Apple Wallet connected'].map((item, index) => <p key={item} className={index === 4 ? 'incomplete' : ''}><span>{index === 4 ? '•' : '✓'}</span>{item}</p>)}</section><section className="panel recent"><div className="panel-heading"><h2>Recent activity</h2><button aria-label="View recent activity">›</button></div>{activity.map((item, index) => <div key={item[0]}><p><strong>{item[0]}</strong><small>{item[1]}</small></p><b className={index === 1 ? 'positive' : ''}>{item[2]}</b></div>)}</section></div>
-        </section>
-        <aside className="security-banner">♢ <span>UFCU will never ask for your password or full account number by phone or email. Call <strong>(800) 555-UFCU</strong> if you receive a suspicious request.</span></aside>
+  const { profile } = useMember()
+  const firstName = profile?.firstName || 'Member'
+  return <div className="dashboard-page">
+    <div className="dashboard-heading">
+      <div><p className="member-eyebrow">MEMBER OVERVIEW</p><h1>Good morning, {firstName}.</h1><p>Here are your next best steps for a clear financial journey.</p></div>
+      <Link to="/profile" className="dashboard-profile-link"><span className="member-avatar">{profile ? `${profile.firstName[0]}${profile.lastName[0]}` : 'M'}</span><span>View profile</span><Icon name="chevronRight" size={16} /></Link>
+    </div>
+
+    <section className="summary-grid" aria-label="Account summary">
+      <Link to="/accounts?account=checking" className="summary-card summary-card-primary"><span className="summary-label">TOTAL BALANCE</span><strong>$4,286.74</strong><span className="summary-meta"><Icon name="checkCircle" size={15} /> Available across your accounts</span></Link>
+      <Link to="/accounts?account=checking" className="summary-card"><span className="summary-label">CHECKING</span><strong>$2,931.20</strong><span className="summary-meta">Everyday Checking · ••4821</span></Link>
+      <Link to="/accounts?account=savings" className="summary-card"><span className="summary-label">SAVINGS</span><strong>$1,355.54</strong><span className="summary-meta">Savings · ••1904</span></Link>
+      <article className="summary-card summary-card-accent"><span className="summary-label">NEXT PAYCHECK</span><strong>$1,842.50</strong><span className="summary-meta"><Icon name="clock" size={15} /> Friday, Nov 29</span></article>
+    </section>
+
+    <section className="quick-actions-section"><div className="section-heading"><div><p className="member-eyebrow">QUICK ACTIONS</p><h2>Keep moving forward</h2></div></div><div className="quick-actions-grid">{quickActions.map(action => <Link to={action.to} className="quick-action" key={action.to}><span className="quick-action-icon"><Icon name={action.icon} size={20} /></span><span>{action.label}</span><Icon name="chevronRight" size={16} /></Link>)}</div></section>
+
+    <div className="dashboard-content-grid">
+      <section className="dashboard-panel upcoming-panel" aria-labelledby="upcoming-title"><div className="panel-heading"><div><p className="member-eyebrow">YOUR FINANCIAL JOURNEY</p><h2 id="upcoming-title">Upcoming payments</h2></div><Link to="/financial-insights" className="panel-link">Manage all <Icon name="arrow" size={15} /></Link></div><div className="payment-list">{payments.map(payment => <div className="payment-row" key={payment.name}><span className={`payment-icon payment-icon-${payment.tone}`}><Icon name={payment.icon} size={18} /></span><span className="payment-copy"><strong>{payment.name}</strong><small>{payment.date} · {payment.detail}</small></span><span className={`payment-amount ${payment.tone}`}>{payment.amount}<small className={`payment-status status-${payment.status.toLowerCase().replaceAll(' ', '-')}`}>{payment.status}</small></span></div>)}</div></section>
+      <div className="dashboard-side-column">
+        <section className="dashboard-panel progress-panel" aria-labelledby="progress-title"><div className="panel-heading"><div><p className="member-eyebrow">SETUP PROGRESS</p><h2 id="progress-title">Your next steps</h2></div><strong className="progress-percent">80%</strong></div><div className="member-progress-bar"><span style={{ width: '80%' }} /></div><ul className="setup-list"><li><Icon name="checkCircle" size={17} /> Account opened</li><li><Icon name="checkCircle" size={17} /> Digital card issued</li><li><Icon name="checkCircle" size={17} /> Direct deposit submitted</li><li><Icon name="checkCircle" size={17} /> Smart Switch started</li><li className="setup-pending"><span className="setup-pending-dot" /> Apple Wallet connected</li></ul><Link to="/cards-wallet" className="panel-link">Finish setup <Icon name="arrow" size={15} /></Link></section>
+        <section className="dashboard-panel activity-panel" aria-labelledby="activity-title"><div className="panel-heading"><div><p className="member-eyebrow">RECENT ACTIVITY</p><h2 id="activity-title">Latest transactions</h2></div><Link to="/accounts" aria-label="View all transactions"><Icon name="chevronRight" size={18} /></Link></div><div className="activity-list">{activity.map(([name, detail, amount]) => <div className="activity-row" key={name}><span><strong>{name}</strong><small>{detail}</small></span><b className={amount.startsWith('+') ? 'positive' : ''}>{amount}</b></div>)}</div></section>
       </div>
-    </main>
+    </div>
+
+    <section className="dashboard-bottom-grid"><article className="security-card"><span className="security-card-icon"><Icon name="shield" size={23} /></span><div><p className="member-eyebrow">LEARN AI</p><h2>Know what to look for before you click.</h2><p>Ask questions about phishing, impersonation scams, account protection, and safer banking habits.</p><Link to="/learn-ai" className="panel-link">Ask a security question <Icon name="arrow" size={15} /></Link></div></article><article className="insight-card"><div><p className="member-eyebrow">CASH FLOW</p><h2>Money in is ahead of money out.</h2><p>Review your spending and recurring commitments to keep your next steps clear.</p></div><div className="mini-bars" aria-label="Illustrative cash flow trend"><span style={{ height: '35%' }} /><span style={{ height: '58%' }} /><span style={{ height: '46%' }} /><span style={{ height: '78%' }} /><span style={{ height: '64%' }} /><span style={{ height: '88%' }} /></div><Link to="/financial-insights" className="panel-link">View insights <Icon name="arrow" size={15} /></Link></article></section>
   </div>
 }
-
-function Metric({ label, value, note, accent = false }: { label: string; value: string; note: string; accent?: boolean }) { return <div className="metric-card"><span>{label}</span><strong>{value}</strong><small className={accent ? 'positive' : ''}>{note}</small></div> }

@@ -15,6 +15,6 @@ export function ConfirmationPage() {
     <SmartSwitch />
     <h2 className="next-heading">A glimpse of what’s next</h2>
     <div className="future-grid"><section className="future-card"><Icon name="card" size={25} /><h3>Digital Debit Card</h3><p>Coming in next prototype iteration</p></section><section className="future-card"><Icon name="bank" size={25} /><h3>Manage your money</h3><p>Set goals and manage payments in the UFCU app.</p></section></div>
-    <div className="completion-actions"><Button onClick={() => startTransition(() => { reset(); navigate('/dashboard', { replace: true }) })}>Go to dashboard<Icon name="arrow" size={18} /></Button><p>View your account overview and next steps.</p></div>
+    <div className="completion-actions"><Button onClick={() => startTransition(() => { reset(); navigate('/', { replace: true }) })}>Continue<Icon name="arrow" size={18} /></Button><p>Return to the welcome screen and start a fresh demo.</p></div>
   </>
 }
