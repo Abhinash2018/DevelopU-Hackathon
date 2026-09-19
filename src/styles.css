@@ -336,3 +336,11 @@ input[type="checkbox"], input[type="radio"] { width: 18px; height: 18px; flex-sh
 .selected-card-preview { margin: 0; align-self: start; }
 .selected-card-preview img { width: 100%; max-width: 420px; filter: drop-shadow(0 12px 14px #142b4620); }
 .selected-card-preview figcaption { margin-top: 16px; color: #64748b; font-size: 13px; }
+.financial-background { padding: 24px; margin-bottom: 28px; border: 1px solid #dce4ee; background: #f7fafc; border-radius: 14px; }
+.financial-background h2, .preference-section-title { font-size: 20px; margin: 0 0 12px; color: #203555; }
+.financial-background > p, .income-range > p { font-size: 13px; color: #64748b; margin: 0 0 20px; line-height: 1.6; }
+.income-range { border: 0; padding: 0; margin: 24px 0 0; min-width: 0; }
+.income-range legend { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+.income-range legend span { color: #64748b; font-weight: 400; }
+.income-range-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+@media (max-width: 560px) { .income-range-fields { grid-template-columns: 1fr; } .financial-background { padding: 18px; } }

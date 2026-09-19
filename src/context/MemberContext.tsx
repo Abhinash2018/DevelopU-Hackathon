@@ -1,8 +1,10 @@
 import { createContext, useCallback, useContext, useState, type ReactNode } from 'react'
-import type { MemberPreference, MemberProfile, MembershipDecision, OnboardingStage, SignUpProfile } from '../types/member'
+import type { FinancialBackground, MemberPreference, MemberProfile, MembershipDecision, OnboardingStage, SignUpProfile } from '../types/member'
 
 type MemberContextValue = {
   profile: MemberProfile | null
+  financialBackground: FinancialBackground
+  setFinancialBackground: (background: FinancialBackground) => void
   preferences: MemberPreference[]
   signedIn: boolean
   onboardingStage: OnboardingStage
@@ -24,6 +26,8 @@ type MemberContextValue = {
   signOut: () => void
 }
 
+const emptyFinancialBackground: FinancialBackground = { employmentStatus: '', annualIncomeMin: '', annualIncomeMax: '' }
+
 const MemberContext = createContext<MemberContextValue | null>(null)
 
 const defaultProfile: MemberProfile = {
@@ -42,6 +46,7 @@ const defaultProfile: MemberProfile = {
 }
 
 export function MemberProvider({ children }: { children: ReactNode }) {
+  const [financialBackground, setFinancialBackground] = useState<FinancialBackground>(emptyFinancialBackground)
   const [profile, setProfile] = useState<MemberProfile | null>(null)
   const [preferences, setPreferencesState] = useState<MemberPreference[]>([])
   const [signedIn, setSignedIn] = useState(false)
@@ -61,6 +66,7 @@ export function MemberProvider({ children }: { children: ReactNode }) {
   const createAccount = useCallback((newProfile: SignUpProfile) => {
     const { password: _password, ...memberProfile } = newProfile
     setProfile(memberProfile)
+    setFinancialBackground(emptyFinancialBackground)
     setSelectedCard('classic')
     setPreferencesState([])
     setOnboardingStage('MATCH')
@@ -91,6 +97,8 @@ export function MemberProvider({ children }: { children: ReactNode }) {
 
   return <MemberContext.Provider value={{
     profile,
+    financialBackground,
+    setFinancialBackground,
     preferences,
     signedIn,
     onboardingStage,

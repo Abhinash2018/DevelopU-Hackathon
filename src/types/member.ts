@@ -46,3 +46,9 @@ export type MemberProfile = {
 export type SignUpProfile = MemberProfile & {
   password: string
 }
+
+export type FinancialBackground = {
+  employmentStatus: '' | 'Student' | 'Employed' | 'Self-employed' | 'Unemployed' | 'Retired' | 'Other'
+  annualIncomeMin: string
+  annualIncomeMax: string
+}
