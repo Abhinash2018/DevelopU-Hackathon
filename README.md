@@ -33,7 +33,7 @@ Welcome → Personal information → Contact information → Address → Account
 
 - Back and Continue retain values in React context. Direct links cannot skip incomplete steps.
 - Required fields, email, U.S. phone, date, ZIP, account selection, funding, and both acknowledgments are validated with linked inline errors.
-- Choose one or more sample checking accounts. “Help me choose” and “Learn more” open keyboard-accessible placeholder dialogs.
+- Choose one or more accounts from Recommended, Checking, Savings, Money Market, CDs, and IRAs tabs. The account catalog is populated from the machine-readable product data in `skills/UFCU_products.md`, including Free Checking, Plus Checking, Simply U, Teen Checking, Savings, Teen and Kidz Savings, Special Savings, Money Market, Certificates, and IRAs. “Help me choose” opens a local guided questionnaire covering work/student status, income, balance, overdraft concerns, banking priorities, free-form habits, and interests across UFCU services: savings goals, money market, certificates, IRAs, credit cards, loans, overdraft protection, digital wallets and payments, business banking, insurance, and investments. The answers become a structured profile and are scored against the reference data to provide a recommendation and comparison choices. “Learn more” opens a keyboard-accessible product-detail placeholder dialog.
 - All three funding methods are simulated. Bank connections use fictional choices; manual and card details are fixed, read-only samples.
 - The processing screen rotates security tips every two seconds and completes after six seconds.
 - Confirmation contains only placeholders for digital debit cards and making UFCU a primary bank. Continue clears the demo and returns to Welcome.
@@ -64,6 +64,6 @@ Use fictional information throughout. No SSN, real account number, card credenti
 - Editing application details clears both review acknowledgments so the revised information is reviewed again.
 - A refresh intentionally starts over. Submitted/completed applications cannot be edited by browser Back; finishing the demo offers a clean restart.
 
-## Next step
+## Prototype boundaries
 
-Review this baseline against the intended UFCU walkthrough and supplied visual references. Once accepted, implement the optional deterministic “Help me choose” questionnaire as a separate iteration. AI, wallets, switching, and real integrations remain out of scope here.
+The account recommendation is deterministic and runs entirely in the browser; it is an AI-guided interaction prototype, not a connection to a live AI service.
