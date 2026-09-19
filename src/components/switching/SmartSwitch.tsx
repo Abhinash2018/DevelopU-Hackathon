@@ -13,45 +13,6 @@ const charges: Charge[] = [
   { id: 'rent', merchant: 'Rent', detail: 'Housing', amount: '$1,200.00', color: '#63748c' },
 ]
 
-const employers = ['Chartwell', 'Texas State University', 'Dining Services']
-
-function DirectDepositSwitch() {
-  const [employer, setEmployer] = useState('')
-  const [connected, setConnected] = useState(false)
-
-  const canConnect = employer
-
-  if (connected) return <section className="deposit-complete" aria-live="polite">
-    <span className="switch-success"><Icon name="check" size={22} /></span>
-    <div>
-      <span className="eyebrow">DIRECT DEPOSIT DEMO READY</span>
-      <h3>Your paycheck switch walkthrough is ready</h3>
-      <p>This prototype prepared a simulated direct deposit handoff for {employer}. Keep your current deposit instructions active until you complete any real changes through your employer’s secure portal.</p>
-    </div>
-  </section>
-
-  return <section className="deposit-switch" aria-labelledby="direct-deposit-title">
-    <div className="deposit-heading">
-      <div>
-        <span className="small-badge switch-badge">DIRECT DEPOSIT</span>
-        <h3 id="direct-deposit-title">Send your paycheck to UFCU</h3>
-        <p>Choose your employer to preview a simulated handoff to their secure payroll portal.</p>
-      </div>
-      <span className="deposit-icon"><Icon name="card" size={23} /></span>
-    </div>
-    <form className="deposit-form" onSubmit={event => { event.preventDefault(); if (canConnect) setConnected(true) }}>
-      <div className="deposit-grid">
-        <label className="field full-width" htmlFor="direct-deposit-employer"><span>Choose your employer</span><select id="direct-deposit-employer" className="input" value={employer} onChange={event => setEmployer(event.target.value)} required aria-required="true"><option value="">Select an employer</option>{employers.map(option => <option key={option} value={option}>{option}</option>)}</select></label>
-      </div>
-      <div className="secure-handoff"><Icon name="lock" size={20} /><div><strong>Continue through your employer’s secure site.</strong><p>This prototype does not collect or store your employer username or password.</p></div></div>
-      <div className="deposit-actions">
-        <p className="switch-disclosure"><Icon name="shield" size={16} /> No payroll credentials are collected in this demo.</p>
-        <Button type="submit" disabled={!canConnect}>Continue to secure employer portal <Icon name="arrow" size={17} /></Button>
-      </div>
-    </form>
-  </section>
-}
-
 export function SmartSwitch() {
   const [bank, setBank] = useState('')
   const [connected, setConnected] = useState(false)
@@ -61,7 +22,7 @@ export function SmartSwitch() {
   const total = selectedCharges.reduce((sum, charge) => sum + Number(charge.amount.replace(/[$,]/g, '')), 0)
   const toggle = (id: string) => setSelected(current => current.includes(id) ? current.filter(item => item !== id) : [...current, id])
 
-  if (complete) return <><section className="switch-complete" aria-live="polite"><span className="switch-success"><Icon name="check" size={22} /></span><div><span className="eyebrow">SWITCH REQUEST READY</span><h2>Your payment switch request is ready</h2><p>{selectedCharges.length} recurring {selectedCharges.length === 1 ? 'payment' : 'payments'} were selected. Some merchants may require separate confirmation before a payment moves to UFCU.</p></div></section><DirectDepositSwitch /></>
+  if (complete) return <section className="switch-complete" aria-live="polite"><span className="switch-success"><Icon name="check" size={22} /></span><div><span className="eyebrow">SWITCH REQUEST READY</span><h2>Your payment switch request is ready</h2><p>{selectedCharges.length} recurring {selectedCharges.length === 1 ? 'payment' : 'payments'} were selected. Some merchants may require separate confirmation before a payment moves to UFCU.</p></div></section>
 
   return <section className="smart-switch" aria-labelledby="smart-switch-title">
     <div className="switch-heading"><div><span className="small-badge switch-badge">SMART SWITCH</span><h2 id="smart-switch-title">Bring your recurring payments with you</h2><p>Connect another bank to find subscriptions and recurring payments you can move to UFCU.</p></div><span className="switch-icon"><Icon name="bank" size={27} /></span></div>
