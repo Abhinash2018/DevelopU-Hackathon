@@ -6,6 +6,7 @@ import { FormField, SelectField } from '../components/forms/FormField'
 import { MemberSetupShell } from '../components/layout/MemberSetupShell'
 import { useMember } from '../context/MemberContext'
 import { IdentityImageUpload } from '../components/forms/IdentityImageUpload'
+import memberWelcome from '../assets/member-welcome.jpg'
 import { states } from '../data/states'
 import type { SignUpProfile } from '../types/member'
 
@@ -26,7 +27,8 @@ export function LoginPage() {
     navigate('/dashboard', { replace: true })
   }
 
-  return <MemberSetupShell>
+  return <MemberSetupShell wide>
+    <div className="login-layout">
     <section className="auth-card" aria-labelledby="login-title">
       <div className="auth-heading">
         <span className="auth-icon"><Icon name="lock" size={25} /></span>
@@ -48,6 +50,11 @@ export function LoginPage() {
       <Link to="/signup" className="button button-secondary member-full-button">Create an account <Icon name="arrow" size={18} /></Link>
       <p className="security-callout"><Icon name="shield" size={18} /> UFCU will never ask for your password through chat or an unsolicited message.</p>
     </section>
+    <aside className="login-welcome" aria-label="Welcome to UFCU">
+      <img src={memberWelcome} alt="A woman smiling while using her phone beside a laptop" width="612" height="408" fetchPriority="high" />
+      <div className="login-welcome-copy"><p className="member-eyebrow">YOUR NEXT CHAPTER STARTS HERE</p><h2>More possibilities.<br />One place to begin.</h2><p>From everyday banking to your next big step, make room for what matters to you.</p><span className="login-welcome-note"><Icon name="shield" size={18} /> Here for you, every step of the way.</span></div>
+    </aside>
+    </div>
   </MemberSetupShell>
 }
 

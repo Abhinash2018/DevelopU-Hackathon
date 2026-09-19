@@ -360,3 +360,17 @@ button.map-pin::after { content: ''; position: absolute; inset: -14px; }
 .offer-detail-meta dt { font-size: 12px; color: #64748b; }
 .offer-detail-meta dd { margin: 5px 0 0; font-weight: 600; }
 .offer-detail-note { font-size: 12px; color: #64748b; margin-top: 18px; }
+
+.member-setup-main-wide { width: min(100% - 64px, 1180px); }
+.login-layout { display: grid; grid-template-columns: minmax(0, 480px) minmax(0, 1fr); align-items: center; gap: 44px; }
+.login-layout .auth-card { width: 100%; padding: 38px; }
+.login-welcome { overflow: hidden; border-radius: 22px; background: #122a48; box-shadow: 0 18px 50px #20365c14; }
+.login-welcome > img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; }
+.login-welcome-copy { padding: 36px; color: #fff; }
+.login-welcome-copy .member-eyebrow { color: #ffc18e; font-size: 10px; }
+.login-welcome-copy h2 { font-size: clamp(25px, 2.7vw, 36px); line-height: 1.2; letter-spacing: -.7px; margin: 14px 0; color: #fff; }
+.login-welcome-copy > p:not(.member-eyebrow) { font-size: 14px; line-height: 1.7; color: #d0deec; max-width: 380px; }
+.login-welcome-note { display: flex; align-items: center; gap: 9px; margin-top: 26px; padding-top: 20px; border-top: 1px solid #ffffff24; color: #d0deec; font-size: 12px; }
+.login-welcome-note svg { flex-shrink: 0; color: #ffc18e; }
+@media (max-width: 960px) { .login-layout { gap: 24px; grid-template-columns: 1fr 1fr; } .login-layout .auth-card { padding: 28px; } .login-welcome-copy { padding: 26px; } }
+@media (max-width: 760px) { .member-setup-main-wide { width: min(100% - 32px, 500px); } .login-layout { grid-template-columns: 1fr; gap: 28px; } .login-layout .auth-card { padding: 30px 23px; } .login-welcome-copy h2 { font-size: 28px; } }
