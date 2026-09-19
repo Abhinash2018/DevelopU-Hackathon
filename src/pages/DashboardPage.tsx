@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
 import ufcuLogo from '../assets/ufcu-logo-oval.png'
+import { useOnboarding } from '../context/OnboardingContext'
 
 const navigation = ['Overview', 'Accounts', 'Move Money', 'Smart Switch', 'Direct Deposit', 'Cards & Wallet', 'Financial Insights', 'Nearby Offers', 'Goals', 'Learn', 'Profile']
 const actions = ['Move Money', 'Smart Switch', 'Direct Deposit', 'Apple Wallet', 'Insights', 'Nearby Offers', 'Ask TrustNav']
@@ -20,16 +21,20 @@ function Glyph({ children }: { children: string }) { return <span className="das
 export function DashboardPage() {
   const [active, setActive] = useState('Overview')
   const [notice, setNotice] = useState('')
+  const { data } = useOnboarding()
+  const firstName = data.personalInfo.firstName.trim() || 'Ayush'
+  const fullName = [data.personalInfo.firstName, data.personalInfo.lastName].map(name => name.trim()).filter(Boolean).join(' ') || 'Ayush Patel'
+  const initials = fullName.split(/\s+/).map(name => name[0]).slice(0, 2).join('').toUpperCase()
   return <div className="dashboard-shell">
     <aside className="dashboard-sidebar">
       <Link to="/" className="dashboard-logo"><img src={ufcuLogo} alt="UFCU" /></Link>
       <nav aria-label="Dashboard navigation">{navigation.map((item, index) => <button key={item} className={active === item ? 'dashboard-nav active' : 'dashboard-nav'} onClick={() => setActive(item)}><Glyph>{['▦', '▣', '↔', '⟳', '▥', '▭', '⌁', '⌖', '◎', '▯', '♙'][index]}</Glyph>{item}</button>)}</nav>
-      <button className="member-card" onClick={() => setActive('Profile')}><span>AP</span><strong>Ayush Patel<small>Member #00124</small></strong><b>›</b></button>
+      <button className="member-card" onClick={() => setActive('Profile')}><span>{initials}</span><strong>{fullName}<small>Member #00124</small></strong><b>›</b></button>
     </aside>
     <main className="dashboard-main">
-      <header className="dashboard-topbar"><div><span>Good morning,</span><strong>Ayush Patel</strong></div><div className="topbar-tools"><button aria-label="Search">⌕</button><button aria-label="Notifications">♧<i /></button><button className="avatar" aria-label="Profile">AP</button></div></header>
+      <header className="dashboard-topbar"><div><span>Good morning,</span><strong>{fullName}</strong></div><div className="topbar-tools"><button aria-label="Search">⌕</button><button aria-label="Notifications">♧<i /></button><button className="avatar" aria-label="Profile">{initials}</button></div></header>
       <div className="dashboard-content">
-        <section className="dashboard-welcome"><h1>Good morning, Ayush.</h1><p>Here are your next best steps.</p></section>
+        <section className="dashboard-welcome"><h1>Good morning, {firstName}.</h1><p>Here are your next best steps.</p></section>
         <section className="metric-grid" aria-label="Account overview">
           <Metric label="Total Balance" value="$8,214.53" note="↗ +2.4%" accent /><Metric label="Checking" value="$3,842.10" note="Everyday Checking •• 4821" /><Metric label="Savings" value="$4,372.43" note="Smart Savings •• 6104" />
           <Metric label="Safe to Spend" value="$1,240.00" note="After bills & goals" /><Metric label="Next Paycheck" value="$1,842.50" note="Expected Nov 29" /><div className="metric-card journey"><span>Journey</span><strong>74%</strong><small>4 of 5 steps done</small><div><i /></div></div>
