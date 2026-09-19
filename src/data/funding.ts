@@ -1,9 +1,9 @@
 import type { FundingMethod } from '../types/onboarding'
 
 export const fundingMethods: { id: Exclude<FundingMethod, ''>; name: string; description: string; icon: 'bank' | 'document' | 'card' }[] = [
-  { id: 'bank', name: 'Connect another bank', description: 'Try a simulated bank connection.', icon: 'bank' },
-  { id: 'manual', name: 'Enter bank information manually', description: 'Preview a transfer with sample bank details.', icon: 'document' },
-  { id: 'card', name: 'Fund with debit/credit card', description: 'Preview funding with a sample card.', icon: 'card' },
+  { id: 'bank', name: 'Connect another bank', description: 'Use an external bank account for your opening deposit.', icon: 'bank' },
+  { id: 'manual', name: 'Enter bank information manually', description: 'Provide routing and account details.', icon: 'document' },
+  { id: 'card', name: 'Fund with debit/credit card', description: 'Use a debit or credit card for your opening deposit.', icon: 'card' },
 ]
 
 export const demoBanks = ['Demo Community Bank', 'Sample Credit Union']

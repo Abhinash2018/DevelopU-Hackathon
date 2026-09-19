@@ -11,7 +11,7 @@ export function PersonalInfoPage() {
   const { errors, onSubmit } = useStepForm(1, () => navigate('/apply/contact'))
   const set = (field: keyof typeof data.personalInfo, value: string) => update('personalInfo', { ...data.personalInfo, [field]: value })
   return <>
-    <PageHeading eyebrow="NICE TO MEET YOU" title="Let’s start with you." description="Tell us a little about yourself. Please use fictional information for this demo." />
+    <PageHeading eyebrow="NICE TO MEET YOU" title="Let’s start with you." description="Tell us a little about yourself." />
     <form noValidate autoComplete="off" onSubmit={onSubmit}>
       <p className="form-note">All fields are required unless marked optional.</p>
       <div className="form-grid">
@@ -20,7 +20,7 @@ export function PersonalInfoPage() {
         <FormField id="lastName" label="Last name" value={data.personalInfo.lastName} onChange={e => set('lastName', e.target.value)} error={errors.lastName} required maxLength={80} />
         <FormField id="dateOfBirth" label="Date of birth" type="date" min="1900-01-01" value={data.personalInfo.dateOfBirth} onChange={e => set('dateOfBirth', e.target.value)} error={errors.dateOfBirth} hint="Use a fictional date of birth." required />
       </div>
-      <div className="quiet-note">There’s no identity check in this prototype, and we don’t ask for a Social Security number.</div>
+      <div className="quiet-note">We use your information to set up your membership and account preferences.</div>
       <FormActions back="/" />
     </form>
   </>
