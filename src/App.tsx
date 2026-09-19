@@ -12,6 +12,7 @@ import { FundingPage } from './pages/FundingPage'
 import { ReviewPage } from './pages/ReviewPage'
 import { ProcessingPage } from './pages/ProcessingPage'
 import { ConfirmationPage } from './pages/ConfirmationPage'
+import { DashboardPage } from './pages/DashboardPage'
 
 function StepGuard() {
   const { data, status } = useOnboarding()
@@ -28,7 +29,7 @@ function StepGuard() {
 }
 
 export default function App() {
-  return <OnboardingProvider><Routes><Route element={<StepGuard />}><Route element={<PageContainer />}>
+  return <OnboardingProvider><Routes><Route path="/dashboard" element={<DashboardPage />} /><Route element={<StepGuard />}><Route element={<PageContainer />}>
     <Route path="/" element={<StartPage />} />
     <Route path="/apply" element={<Navigate to="/apply/personal" replace />} />
     <Route path="/apply/personal" element={<PersonalInfoPage />} />
