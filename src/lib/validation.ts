@@ -37,14 +37,14 @@ export function validateStep(step: number, data: OnboardingData): FormErrors {
   }
   if (step === 5) {
     if (!fundingMethods.some(method => method.id === data.funding.method)) errors.method = 'Choose a funding method.'
-    if (data.funding.method === 'bank' && !demoBanks.includes(data.funding.demoBank)) errors.demoBank = 'Choose a demo bank.'
+    if (data.funding.method === 'bank' && !demoBanks.includes(data.funding.demoBank)) errors.demoBank = 'Choose a bank.'
     if (!/^\d+(\.\d{1,2})?$/.test(data.funding.amount) || Number(data.funding.amount) <= 0 || Number(data.funding.amount) > 10000) {
       errors.amount = 'Enter an amount from $0.01 to $10,000, with up to two decimal places.'
     }
   }
   if (step === 6) {
     if (!data.disclosuresAccepted) errors.disclosuresAccepted = 'Accept the sample disclosures to continue.'
-    if (!data.consentAccepted) errors.consentAccepted = 'Confirm your consent to submit this demo application.'
+    if (!data.consentAccepted) errors.consentAccepted = 'Confirm your consent to submit your application.'
   }
   return errors
 }

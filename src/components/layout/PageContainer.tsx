@@ -10,7 +10,7 @@ export function PageContainer() {
   const currentStep = Math.max(0, steps.findIndex(step => step.path === pathname))
   const mainRef = useRef<HTMLElement>(null)
   useEffect(() => {
-    document.title = `${steps[currentStep].label} | UFCU Prototype`
+    document.title = `${steps[currentStep].label} | UFCU`
     mainRef.current?.focus({ preventScroll: true })
     window.scrollTo({ top: 0, behavior: 'instant' })
   }, [pathname, currentStep])
@@ -28,7 +28,7 @@ export function PageContainer() {
             <div style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }} />
           </div>
           <div className="page-card"><Outlet /></div>
-          <p className="session-note">A local demo. Your progress is kept only while this page is open.</p>
+          <p className="session-note">Your progress is saved while you complete your application.</p>
         </main>
       </div>
     </div>
