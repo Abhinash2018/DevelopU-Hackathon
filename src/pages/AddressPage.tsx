@@ -12,7 +12,7 @@ export function AddressPage() {
   const { errors, onSubmit } = useStepForm(3, () => navigate('/apply/accounts'))
   const set = (field: keyof typeof data.address, value: string) => update('address', { ...data.address, [field]: value })
   return <>
-    <PageHeading eyebrow="A PLACE TO CALL HOME" title="What’s your address?" description="Tell us where you live so we can set up your membership." />
+    <PageHeading eyebrow="A PLACE TO CALL HOME" title="What’s your address?" description="Use a fictional U.S. residential address for your demo application." />
     <form noValidate autoComplete="off" onSubmit={onSubmit}>
       <div className="form-grid">
         <div className="full-width"><FormField id="street" label="Street address" value={data.address.street} onChange={e => set('street', e.target.value)} error={errors.street} placeholder="123 Sample Street" required maxLength={160} /></div>
